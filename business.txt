@@ -1,0 +1,9 @@
+Pendings:
+- Dockerfiles
+- Docker compose para poder levantar en local tanto Postgres, Nats.io. Redis y los 3 microservicios
+- Uso de paginado a la hora de traer y cachear el timeline con una mejora en el mecanimsmo de flusheo
+- Yamls file para deploy en k8s
+- Rest repositories porque estan mockeados
+- DDL para postgres
+- Tests unitarios
+- Tests de integracion

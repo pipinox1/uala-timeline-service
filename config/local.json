@@ -1,0 +1,16 @@
+{
+  "env": "dev",
+  "service_name": "timeline-service",
+  "postgres": {
+    "port": 5432,
+    "user": "eduardopena",
+    "password": "",
+    "host": "localhost",
+    "database": "timelines",
+    "ssl": false
+  },
+  "redis": {
+    "host": "localhost:6379"
+  },
+  "port": 8081
+}

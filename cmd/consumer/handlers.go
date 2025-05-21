@@ -11,9 +11,23 @@ import (
 )
 
 func handlePostCreated(dependencies *config.Dependencies) func(msg *nats.Msg) {
+	splitPostUpdateForUsers := application.NewSplitPostUpdateForUsers(
+		dependencies.PostRepository,
+		dependencies.FollowRepository,
+		dependencies.EventPublisher,
+	)
 	return func(msg *nats.Msg) {
-		fmt.Println("Recibido")
-		log.Printf("Recibido: %s\n", string(msg.Data))
+		var cmd application.SplitPostUpdateForUsersCommand
+		err := json.Unmarshal(msg.Data, &cmd)
+		if err != nil {
+			log.Printf("Error unmarshalling data: %v\n", err)
+			return
+		}
+		err = splitPostUpdateForUsers.Exec(context.Background(), &cmd)
+		if err != nil {
+			msg.Nak()
+		}
+		msg.Ack()
 	}
 }
 
@@ -26,7 +40,11 @@ func addPostToTimeline(dependencies *config.Dependencies) func(msg *nats.Msg) {
 			log.Printf("Error unmarshalling data: %v\n", err)
 			return
 		}
-		addPostToTimeline.Exec(context.Background(), &cmd)
+		err = addPostToTimeline.Exec(context.Background(), &cmd)
+		if err != nil {
+			msg.Nak()
+		}
+		msg.Ack()
 	}
 }
 

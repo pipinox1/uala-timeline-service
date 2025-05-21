@@ -30,17 +30,22 @@ func addPostToUserTimeline(deps *config.Dependencies) http.HandlerFunc {
 	}
 }
 
-func getUserTimeline(deps *config.Dependencies) http.HandlerFunc {
+func getUserTimelineByDay(deps *config.Dependencies) http.HandlerFunc {
 	createPost := application.NewGetUserTimeline(deps.TimelineService)
 	return func(w http.ResponseWriter, r *http.Request) {
+		var cmd application.GetUserTimelineCommand
+		err := json.NewDecoder(r.Body).Decode(&cmd)
+		if err != nil {
+			handleError(w, err)
+			return
+		}
+
 		userID := chi.URLParam(r, "user_id")
 		if userID == "" {
 			handleError(w, ErrInvalidUser)
 			return
 		}
-		cmd := application.GetUserTimelineCommand{
-			UserID: userID,
-		}
+		cmd.UserID = userID
 		response, err := createPost.Exec(r.Context(), &cmd)
 		if err != nil {
 			handleError(w, err)

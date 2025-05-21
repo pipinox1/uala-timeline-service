@@ -20,10 +20,10 @@ type Post struct {
 type Content struct {
 	Type string  `json:"type"`
 	Text *string `json:"text"`
-	Url  *string `json:"url"`
+	Url  *string `json:"url,omitempty"`
 }
 
-func FromDomain(timelineFilled *domain.TimelineFilled) *TimelineFilled {
+func FromDomain(timelineFilled *domain.DayUserTimelineFilled) *TimelineFilled {
 	posts := make([]Post, len(timelineFilled.Posts))
 	for i, post := range timelineFilled.Posts {
 		contents := make([]Content, len(post.Contents))

@@ -16,11 +16,11 @@ func SetupConsumer(config *config.Config, deps *config.Dependencies) (*nats.Conn
 	if err != nil {
 		log.Fatalf("Error en QueueSubscribe: %v", err)
 	}
-	qsub2, err := nc.QueueSubscribe("user_timeline.add_post", config.ServiceName, handlePostCreated(deps))
+	qsub2, err := nc.QueueSubscribe("user_timeline.add_post", config.ServiceName, addPostToTimeline(deps))
 	if err != nil {
 		log.Fatalf("Error en QueueSubscribe: %v", err)
 	}
-	qsub3, err := nc.QueueSubscribe("user_timeline.remove_post", config.ServiceName, handlePostCreated(deps))
+	qsub3, err := nc.QueueSubscribe("user_timeline.remove_post", config.ServiceName, removePostFromTimeline(deps))
 	if err != nil {
 		log.Fatalf("Error en QueueSubscribe: %v", err)
 	}

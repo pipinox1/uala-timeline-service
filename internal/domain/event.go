@@ -7,12 +7,12 @@ const (
 )
 
 type UserTimelineAddPostEvent struct {
-	ID     string `json:"id"`
+	PostID string `json:"post_id"`
 	UserID string `json:"user_id"`
 }
 
 func (p UserTimelineAddPostEvent) Key() string {
-	return p.ID
+	return p.PostID
 }
 
 func (p UserTimelineAddPostEvent) Topic() string {
@@ -25,5 +25,5 @@ func (p UserTimelineAddPostEvent) Payload() []byte {
 }
 
 func NewUserTimelineAddPostEvent(userID string, postID string) UserTimelineAddPostEvent {
-	return UserTimelineAddPostEvent{ID: postID, UserID: userID}
+	return UserTimelineAddPostEvent{PostID: postID, UserID: userID}
 }

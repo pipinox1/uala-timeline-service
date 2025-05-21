@@ -1,0 +1,116 @@
+package infrastructure
+
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/go-resty/resty/v2"
+	"strings"
+	"time"
+	"uala-timeline-service/internal/domain"
+)
+
+var _ domain.PostRepository = (*RestPostRepository)(nil)
+
+type RestPostRepository struct {
+	client  *resty.Client
+	baseURL string
+}
+
+func NewRestPostRepository(baseURL string) *RestPostRepository {
+	return &RestPostRepository{
+		client:  resty.New(),
+		baseURL: baseURL,
+	}
+}
+
+func (r *RestPostRepository) GetPostById(ctx context.Context, id string) (*domain.Post, error) {
+	endpoint := fmt.Sprintf("%s/api/v1/posts/%s", r.baseURL, id)
+
+	resp, err := r.client.R().
+		SetContext(ctx).
+		Get(endpoint)
+
+	if err != nil {
+		return nil, fmt.Errorf("error fetching post: %w", err)
+	}
+
+	if resp.IsError() {
+		return nil, fmt.Errorf("API returned error status: %d - %s", resp.StatusCode(), resp.String())
+	}
+
+	var response postResponse
+	err = json.Unmarshal(resp.Body(), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	return response.toDomain(), nil
+}
+
+type multiGetResponse struct {
+	Posts []postResponse `json:"posts"`
+}
+
+func (r *RestPostRepository) MGetPosts(ctx context.Context, postIDs []string) ([]domain.Post, error) {
+	if len(postIDs) == 0 {
+		return []domain.Post{}, nil
+	}
+	idsParam := strings.Join(postIDs, ",")
+	endpoint := fmt.Sprintf("%s/api/v1/posts?ids=%s", r.baseURL, idsParam)
+
+	resp, err := r.client.R().
+		SetContext(ctx).
+		Get(endpoint)
+
+	if err != nil {
+		return nil, fmt.Errorf("error fetching posts: %w", err)
+	}
+
+	if resp.IsError() {
+		return nil, fmt.Errorf("API returned error status: %d - %s", resp.StatusCode(), resp.String())
+	}
+
+	var response multiGetResponse
+	err = json.Unmarshal(resp.Body(), &response)
+	if err != nil {
+		return nil, err
+	}
+
+	posts := make([]domain.Post, len(response.Posts))
+	for i, apiPost := range response.Posts {
+		posts[i] = *apiPost.toDomain()
+	}
+
+	return posts, nil
+}
+
+type postResponse struct {
+	ID          string        `json:"id"`
+	Contents    []PostContent `json:"contents"`
+	AuthorID    string        `json:"author_id"`
+	PublishedAt time.Time     `json:"published_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
+}
+
+type PostContent struct {
+	Type string  `json:"type"`
+	Text *string `json:"text,omitempty"`
+}
+
+func (p postResponse) toDomain() *domain.Post {
+	contents := make([]domain.Content, len(p.Contents))
+	for i, content := range p.Contents {
+		contents[i] = domain.Content{
+			Type: content.Type,
+			Text: content.Text,
+		}
+	}
+	return &domain.Post{
+		ID:          p.ID,
+		Contents:    contents,
+		AuthorID:    p.AuthorID,
+		PublishedAt: p.PublishedAt,
+		UpdatedAt:   p.UpdatedAt,
+	}
+}

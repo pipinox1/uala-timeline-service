@@ -1,5 +1,6 @@
 package infrastructure
 
+/*
 import (
 	"context"
 	"encoding/json"
@@ -10,7 +11,7 @@ import (
 	"uala-timeline-service/internal/domain"
 )
 
-var _ domain.TimelineFilledRepository = (*TimelineFilledRepository)(nil)
+var _ domain.DayUserTimelineFilledRepository = (*TimelineFilledRepository)(nil)
 
 type TimelineFilledRepository struct {
 	redisClient *redis.Client
@@ -24,7 +25,7 @@ func NewTimelineFilledRepository(redisClient *redis.Client) *TimelineFilledRepos
 	}
 }
 
-func (t *TimelineFilledRepository) GetUserTimeline(ctx context.Context, userID string) (*domain.TimelineFilled, error) {
+func (t *TimelineFilledRepository) GetUserTimeline(ctx context.Context, userID string) (*domain.DayUserTimelineFilled, error) {
 	key := buildTimelineKey(userID)
 
 	data, err := t.redisClient.Get(ctx, key).Bytes()
@@ -45,7 +46,7 @@ func (t *TimelineFilledRepository) GetUserTimeline(ctx context.Context, userID s
 	return timeline, nil
 }
 
-func (t *TimelineFilledRepository) Update(ctx context.Context, timelineFilled *domain.TimelineFilled) error {
+func (t *TimelineFilledRepository) Update(ctx context.Context, timelineFilled *domain.DayUserTimelineFilled) error {
 	key := buildTimelineKey(timelineFilled.UserID)
 	data, err := json.Marshal(mapDomainToRedis(timelineFilled))
 	if err != nil {
@@ -63,7 +64,7 @@ func buildTimelineKey(userID string) string {
 	return fmt.Sprintf("timeline:%s", userID)
 }
 
-func mapDomainToRedis(timeline *domain.TimelineFilled) redisTimelineFilled {
+func mapDomainToRedis(timeline *domain.DayUserTimelineFilled) redisTimelineFilled {
 	redisTimeline := redisTimelineFilled{
 		LastUpdate: timeline.LastUpdate,
 		UserID:     timeline.UserID,
@@ -91,8 +92,8 @@ func mapDomainToRedis(timeline *domain.TimelineFilled) redisTimelineFilled {
 	return redisTimeline
 }
 
-func mapRedisToDomain(redisTimeline redisTimelineFilled) *domain.TimelineFilled {
-	timeline := &domain.TimelineFilled{
+func mapRedisToDomain(redisTimeline redisTimelineFilled) *domain.DayUserTimelineFilled {
+	timeline := &domain.DayUserTimelineFilled{
 		LastUpdate: redisTimeline.LastUpdate,
 		UserID:     redisTimeline.UserID,
 		Posts:      make([]domain.Post, 0, len(redisTimeline.Posts)),
@@ -137,3 +138,5 @@ type redisContent struct {
 	Text *string `json:"text,omitempty"`
 	Url  *string `json:"url,omitempty"`
 }
+
+*/

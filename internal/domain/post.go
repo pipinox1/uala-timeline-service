@@ -2,6 +2,7 @@ package domain
 
 import (
 	"context"
+	"time"
 )
 
 type PostRepository interface {
@@ -10,9 +11,11 @@ type PostRepository interface {
 }
 
 type Post struct {
-	ID       string
-	Contents []Content
-	AuthorID string
+	ID          string
+	Contents    []Content
+	AuthorID    string
+	PublishedAt time.Time
+	UpdatedAt   time.Time
 }
 
 type Content struct {

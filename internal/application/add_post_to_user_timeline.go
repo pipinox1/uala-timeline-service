@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"uala-timeline-service/internal/domain"
 )
 
@@ -11,11 +12,11 @@ type AddPostToUserTimelineCommand struct {
 }
 
 type AddPostToUserTimeline struct {
-	timelineService domain.TimelineFilledService
+	timelineService domain.DayUserTimelineFilledService
 }
 
 func NewAddPostToUserTimeline(
-	timelineService domain.TimelineFilledService,
+	timelineService domain.DayUserTimelineFilledService,
 ) *AddPostToUserTimeline {
 	return &AddPostToUserTimeline{
 		timelineService: timelineService,
@@ -23,7 +24,8 @@ func NewAddPostToUserTimeline(
 }
 
 func (g *AddPostToUserTimeline) Exec(ctx context.Context, cmd *AddPostToUserTimelineCommand) error {
-	err := g.timelineService.AddPost(ctx, cmd.UserID, cmd.PostID)
+	fmt.Println("Adding post")
+	err := g.timelineService.AddPost(ctx, cmd.PostID, cmd.UserID)
 	if err != nil {
 		return err
 	}

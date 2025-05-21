@@ -1,6 +1,12 @@
 {
   "env": "dev",
   "service_name": "timeline-service",
+  "rest_apis": {
+    "post_service": {
+      "base_path": "http://localhost:8080",
+      "timeout": 2000
+    }
+  },
   "postgres": {
     "port": 5432,
     "user": "eduardopena",
@@ -11,6 +17,12 @@
   },
   "redis": {
     "host": "localhost:6379"
+  },
+  "aws": {
+    "region": "localhost",
+    "table": "users-timelines",
+    "account": "lhg4g",
+    "secret": "qcdbm4"
   },
   "port": 8081
 }

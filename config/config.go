@@ -13,10 +13,27 @@ type Config struct {
 	Port        string   `json:"port"`
 	Postgres    Postgres `json:"postgres"`
 	Redis       Redis    `json:"redis"`
+	AWS         AWS      `json:"aws"`
+}
+
+type RestConfigs struct {
+	PostService RestConfig `json:"post_service"`
 }
 
 type Redis struct {
 	Host string `json:"redis_host"`
+}
+
+type RestConfig struct {
+	BasePath string `json:"base_path"`
+	Timeout  int    `json:"timeout"`
+}
+
+type AWS struct {
+	Region  string `json:"region"`
+	Table   string `json:"table"`
+	Secret  string `json:"secret"`
+	Account string `json:"account"`
 }
 
 type Postgres struct {

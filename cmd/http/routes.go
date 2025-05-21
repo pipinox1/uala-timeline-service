@@ -20,7 +20,7 @@ func SetupRouterAndRoutes(config *config.Config, deps *config.Dependencies) chi.
 	router.Route("/api/v1/user_timeline", func(r chi.Router) {
 		r.Use(middleware.SetHeader("Content-Type", "application/json"))
 		r.Use(ddchi.Middleware(ddchi.WithServiceName(config.ServiceName)))
-		r.Get("/{user_id}", getUserTimeline(deps))
+		r.Post("/{user_id}", getUserTimelineByDay(deps))
 		r.Post("/add", addPostToUserTimeline(deps))
 	})
 

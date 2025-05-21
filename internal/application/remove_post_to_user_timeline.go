@@ -11,10 +11,10 @@ type RemovePostToUserTimelineTimeCommand struct {
 }
 
 type RemovePostToUserTimelineTime struct {
-	timelineService domain.TimelineFilledService
+	timelineService domain.DayUserTimelineFilledService
 }
 
-func NewRemovePostToUserTimelineTime(timelineService domain.TimelineFilledService) *RemovePostToUserTimelineTime {
+func NewRemovePostToUserTimelineTime(timelineService domain.DayUserTimelineFilledService) *RemovePostToUserTimelineTime {
 	return &RemovePostToUserTimelineTime{
 		timelineService: timelineService,
 	}

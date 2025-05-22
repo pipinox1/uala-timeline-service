@@ -1,1 +1,3 @@
 En el archivo architecture.md hay una breve explicacion de la arquitectura
+
+Para estar version solo se permite pedir de a 1 día ya que me faltó implementar el multiget en el dynamo por varios dias

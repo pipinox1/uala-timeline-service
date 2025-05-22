@@ -18,3 +18,5 @@ We have three microservices in this architecture:
 
 **Database:** DynamoDB, Postgres
 
+**Message Brokers:** NATS.io
+

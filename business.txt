@@ -1,16 +1,1 @@
-En el serivio uala-posts-service se encuentra el docker-compose para levantar todos los servicios:
-
-Primero hay que correr dentro de cada repositorio despues de ser clonados el comando:
-
-- make build
-
-Estoy generara una imagen de cada microservicio
-
-Luego nos paramos en la terminal sobre el repositorio de uala-posts-service y ejecutamos:
-
-- docker-compose -up -d
-
-Puertos de cada servicio:
-- posts-service : 8080
-- timeline-service: 8081
-- followers-service: 8082
+En el archivo architecture.md hay una breve explicacion de la arquitectura

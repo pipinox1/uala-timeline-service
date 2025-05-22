@@ -1,13 +1,14 @@
 package consumer
 
 import (
+	"fmt"
 	"github.com/nats-io/nats.go"
 	"log"
 	"uala-timeline-service/config"
 )
 
 func SetupConsumer(config *config.Config, deps *config.Dependencies) (*nats.Conn, []*nats.Subscription) {
-	nc, err := nats.Connect("nats://localhost:4222")
+	nc, err := nats.Connect(fmt.Sprintf("nats://%s:4222", config.Nats.Host))
 	if err != nil {
 		log.Fatal("Error conectando a NATS:", err)
 	}

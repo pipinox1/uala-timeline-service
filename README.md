@@ -68,3 +68,21 @@ In the `uala-posts-service` repository, you'll find the `docker-compose` file us
 - posts-service: 8080
 - timeline-service: 8081
 - followers-service: 8082
+
+
+## Usage/Examples
+
+### Get timeline for user 1312 of day 21/5/2025
+
+```bash
+curl --location 'localhost:808'\''/api/v1/user_timeline/1312' \
+--header 'Content-Type: application/json' \
+--data '{
+    "from_day": 21,
+    "from_month": 5,
+    "from_year": 2025,
+    "to_day": 21,
+    "to_month": 5,
+    "to_year": 2025
+}'
+```

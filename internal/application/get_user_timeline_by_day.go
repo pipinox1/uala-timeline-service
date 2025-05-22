@@ -3,7 +3,7 @@ package application
 import (
 	"context"
 	"errors"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/day_timeline_filled"
 )
 
 var (
@@ -25,10 +25,10 @@ type GetUserTimelineResponse struct {
 }
 
 type GetUserTimeline struct {
-	timelineService domain.DayUserTimelineFilledService
+	timelineService day_timeline_filled.DayUserTimelineFilledService
 }
 
-func NewGetUserTimeline(timelineService domain.DayUserTimelineFilledService) *GetUserTimeline {
+func NewGetUserTimeline(timelineService day_timeline_filled.DayUserTimelineFilledService) *GetUserTimeline {
 	return &GetUserTimeline{
 		timelineService: timelineService,
 	}
@@ -38,7 +38,7 @@ func (g *GetUserTimeline) Exec(ctx context.Context, cmd *GetUserTimelineCommand)
 	if cmd.ToDay == 0 || cmd.ToMonth == 0 || cmd.ToYear == 0 || cmd.FromDay == 0 || cmd.FromMonth == 0 || cmd.FromYear == 0 {
 		return nil, DatesFieldAreMandatory
 	}
-	userTimeline, err := g.timelineService.GetDayUserTimelineFilled(ctx, domain.DayUserTimelineFilledFilter{
+	userTimeline, err := g.timelineService.GetDayUserTimelineFilled(ctx, day_timeline_filled.DayUserTimelineFilledFilter{
 		UserID:    cmd.UserID,
 		FromDay:   cmd.FromDay,
 		FromMonth: cmd.FromMonth,

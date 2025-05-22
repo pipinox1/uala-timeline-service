@@ -1,9 +1,10 @@
-package domain
+package timeline
 
 import (
 	"context"
 	"errors"
 	"time"
+	"uala-timeline-service/internal/domain/posts"
 )
 
 var (
@@ -11,6 +12,7 @@ var (
 	ErrUserTimelineInternal = errors.New("user_timeline.internal_error")
 )
 
+//go:generate mockery --name=TimelineRepository --filename=timeline_follow_repository.go --output=../../../mocks --outpkg=mocks
 type TimelineRepository interface {
 	GetUserTimeline(ctx context.Context, userID string, filter TimelineFilter) (*UserTimeline, error)
 	AddPostToUserTimeline(ctx context.Context, userID string, timelinePost PostTimeline) error
@@ -34,7 +36,7 @@ type TimelineFilter struct {
 	Page     int
 }
 
-func CreateTimelinePostFromPost(post Post) PostTimeline {
+func CreateTimelinePostFromPost(post posts.Post) PostTimeline {
 	return PostTimeline{
 		PostID:      post.ID,
 		PublishedAt: post.PublishedAt,

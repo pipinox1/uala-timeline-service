@@ -9,16 +9,18 @@ import (
 	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/follows"
+	"uala-timeline-service/internal/domain/posts"
 	"uala-timeline-service/internal/infrastructure"
 	"uala-timeline-service/libs/events"
 )
 
 type Dependencies struct {
 	EventPublisher   events.Publisher
-	FollowRepository domain.FollowRepository
-	PostRepository   domain.PostRepository
-	TimelineService  domain.DayUserTimelineFilledService
+	FollowRepository follows.FollowRepository
+	PostRepository   posts.PostRepository
+	TimelineService  day_timeline_filled.DayUserTimelineFilledService
 }
 
 func BuildDependencies(config Config) (*Dependencies, error) {
@@ -75,7 +77,7 @@ func BuildDependencies(config Config) (*Dependencies, error) {
 	postRepository := infrastructure.NewRestPostRepository("http://localhost:8080")
 	followsRepository := infrastructure.NewRestFollowsRepository("http://localhost:8082")
 
-	timelineService := domain.NewTimelineService(timelineRepository, postRepository, dayTimelineFilledRepository)
+	timelineService := day_timeline_filled.NewTimelineService(timelineRepository, postRepository, dayTimelineFilledRepository)
 
 	return &Dependencies{
 		TimelineService:  timelineService,

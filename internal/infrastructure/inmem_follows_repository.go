@@ -3,10 +3,10 @@ package infrastructure
 import (
 	"context"
 	"github.com/google/uuid"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/follows"
 )
 
-var _ domain.FollowRepository = (*InmemFollowsRepository)(nil)
+var _ follows.FollowRepository = (*InmemFollowsRepository)(nil)
 
 type InmemFollowsRepository struct {
 }

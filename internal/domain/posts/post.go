@@ -1,10 +1,11 @@
-package domain
+package posts
 
 import (
 	"context"
 	"time"
 )
 
+//go:generate mockery --name=PostRepository --filename=mocks_post_repository.go --output=../../../mocks --outpkg=mocks
 type PostRepository interface {
 	MGetPosts(ctx context.Context, postIDs []string) ([]Post, error)
 	GetPostById(ctx context.Context, id string) (*Post, error)

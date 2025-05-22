@@ -13,12 +13,13 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"io"
 	"time"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/posts"
 )
 
-var _ domain.DayUserTimelineFilledRepository = (*DynamoDayTimelineFilledRepository)(nil)
+var _ day_timeline_filled.DayUserTimelineFilledRepository = (*DynamoDayTimelineFilledRepository)(nil)
 
-var emptyDayFilled = domain.DayUserTimelineFilled{}
+var emptyDayFilled = day_timeline_filled.DayUserTimelineFilled{}
 
 const (
 	dayPrefix = "timeline:"
@@ -38,7 +39,7 @@ func NewDynamoPaymentRepository(client *dynamodb.Client, tableName string) *Dyna
 	}
 }
 
-func (d *DynamoDayTimelineFilledRepository) GetDayUserTimelineFilled(ctx context.Context, filter domain.DayUserTimelineFilledFilter) (*domain.DayUserTimelineFilled, error) {
+func (d *DynamoDayTimelineFilledRepository) GetDayUserTimelineFilled(ctx context.Context, filter day_timeline_filled.DayUserTimelineFilledFilter) (*day_timeline_filled.DayUserTimelineFilled, error) {
 	dayKey := fmt.Sprintf("%v:%v:%v", filter.FromYear, filter.FromMonth, filter.FromDay)
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String(d.tableName),
@@ -54,7 +55,7 @@ func (d *DynamoDayTimelineFilledRepository) GetDayUserTimelineFilled(ctx context
 	}
 
 	if len(result.Item) == 0 {
-		return &domain.DayUserTimelineFilled{
+		return &day_timeline_filled.DayUserTimelineFilled{
 			Posts:  nil,
 			UserID: filter.UserID,
 		}, nil
@@ -69,7 +70,7 @@ func (d *DynamoDayTimelineFilledRepository) GetDayUserTimelineFilled(ctx context
 	return dayTimeline.toDomain()
 }
 
-func (d *DynamoDayTimelineFilledRepository) AddPosts(ctx context.Context, userID string, post []domain.Post) error {
+func (d *DynamoDayTimelineFilledRepository) AddPosts(ctx context.Context, userID string, post []posts.Post) error {
 	dayPostMap := splitPostByDate(post)
 	var transactItems []types.TransactWriteItem
 	for dayKey, newPosts := range dayPostMap {
@@ -122,7 +123,7 @@ func (d *DynamoDayTimelineFilledRepository) AddPosts(ctx context.Context, userID
 	return nil
 }
 
-func (d *DynamoDayTimelineFilledRepository) UpdatePosts(ctx context.Context, userID string, post *domain.Post) error {
+func (d *DynamoDayTimelineFilledRepository) UpdatePosts(ctx context.Context, userID string, post *posts.Post) error {
 	dayKey := buildDateKeyByPost(*post)
 	dayTimeline, err := d.getDayFilled(ctx, userID, dayKey)
 	if err != nil {
@@ -192,7 +193,7 @@ func (d *DynamoDayTimelineFilledRepository) getDayFilled(ctx context.Context, us
 	return &dayTimeline, nil
 }
 
-func (d *DynamoDayTimelineFilledRepository) RemovePost(ctx context.Context, userID string, post *domain.Post) error {
+func (d *DynamoDayTimelineFilledRepository) RemovePost(ctx context.Context, userID string, post *posts.Post) error {
 	dayKey := buildDateKeyByPost(*post)
 	dayTimeline, err := d.getDayFilled(ctx, userID, dayKey)
 	if err != nil {
@@ -252,8 +253,8 @@ type DynamoDayUserTimelinePage struct {
 	Date       time.Time `dynamodbav:"date"`
 }
 
-func (d DynamoDayUserTimelinePage) toDomain() (*domain.DayUserTimelineFilled, error) {
-	decompressedPosts := make([]domain.Post, len(d.Posts))
+func (d DynamoDayUserTimelinePage) toDomain() (*day_timeline_filled.DayUserTimelineFilled, error) {
+	decompressedPosts := make([]posts.Post, len(d.Posts))
 	for i, compressedPost := range d.Posts {
 		decompressedPost, err := decompressPost(compressedPost)
 		if err != nil {
@@ -261,14 +262,14 @@ func (d DynamoDayUserTimelinePage) toDomain() (*domain.DayUserTimelineFilled, er
 		}
 		decompressedPosts[i] = *decompressedPost
 	}
-	return &domain.DayUserTimelineFilled{
+	return &day_timeline_filled.DayUserTimelineFilled{
 		LastUpdate: d.LastUpdate,
 		Posts:      decompressedPosts,
 		UserID:     d.UserID,
 	}, nil
 }
 
-func compressPost(post domain.Post) (string, error) {
+func compressPost(post posts.Post) (string, error) {
 	jsonData, err := json.Marshal(post)
 	if err != nil {
 		return "", err
@@ -289,7 +290,7 @@ func compressPost(post domain.Post) (string, error) {
 	return base64.StdEncoding.EncodeToString(compressedPost.Bytes()), nil
 }
 
-func decompressPost(compressedPost string) (*domain.Post, error) {
+func decompressPost(compressedPost string) (*posts.Post, error) {
 	compressedData, err := base64.StdEncoding.DecodeString(compressedPost)
 	if err != nil {
 		return nil, fmt.Errorf("error to decoding on base64: %v", err)
@@ -306,7 +307,7 @@ func decompressPost(compressedPost string) (*domain.Post, error) {
 		return nil, fmt.Errorf("error decompressing post: %v", err)
 	}
 
-	var post domain.Post
+	var post posts.Post
 	err = json.Unmarshal(decompressedPost, &post)
 	if err != nil {
 		return nil, err
@@ -315,20 +316,20 @@ func decompressPost(compressedPost string) (*domain.Post, error) {
 	return &post, nil
 }
 
-func splitPostByDate(posts []domain.Post) map[string][]domain.Post {
-	postsMapByDay := make(map[string][]domain.Post)
-	for _, post := range posts {
+func splitPostByDate(domainPosts []posts.Post) map[string][]posts.Post {
+	postsMapByDay := make(map[string][]posts.Post)
+	for _, post := range domainPosts {
 		key := buildDateKeyByPost(post)
 		if _, ok := postsMapByDay[key]; ok {
 			postsMapByDay[key] = append(postsMapByDay[key], post)
 			continue
 		}
-		postsMapByDay[key] = []domain.Post{post}
+		postsMapByDay[key] = []posts.Post{post}
 	}
 	return postsMapByDay
 }
 
-func buildDateKeyByPost(post domain.Post) string {
+func buildDateKeyByPost(post posts.Post) string {
 	return fmt.Sprintf("%v:%v:%v", post.PublishedAt.Year(), int(post.PublishedAt.Month()), post.PublishedAt.Day())
 }
 

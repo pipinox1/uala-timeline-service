@@ -7,10 +7,10 @@ import (
 	"github.com/go-resty/resty/v2"
 	"strings"
 	"time"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/posts"
 )
 
-var _ domain.PostRepository = (*RestPostRepository)(nil)
+var _ posts.PostRepository = (*RestPostRepository)(nil)
 
 type RestPostRepository struct {
 	client  *resty.Client
@@ -24,7 +24,7 @@ func NewRestPostRepository(baseURL string) *RestPostRepository {
 	}
 }
 
-func (r *RestPostRepository) GetPostById(ctx context.Context, id string) (*domain.Post, error) {
+func (r *RestPostRepository) GetPostById(ctx context.Context, id string) (*posts.Post, error) {
 	endpoint := fmt.Sprintf("%s/api/v1/posts/%s", r.baseURL, id)
 
 	resp, err := r.client.R().
@@ -52,9 +52,9 @@ type multiGetResponse struct {
 	Posts []postResponse `json:"posts"`
 }
 
-func (r *RestPostRepository) MGetPosts(ctx context.Context, postIDs []string) ([]domain.Post, error) {
+func (r *RestPostRepository) MGetPosts(ctx context.Context, postIDs []string) ([]posts.Post, error) {
 	if len(postIDs) == 0 {
-		return []domain.Post{}, nil
+		return []posts.Post{}, nil
 	}
 	idsParam := strings.Join(postIDs, ",")
 	endpoint := fmt.Sprintf("%s/api/v1/posts?ids=%s", r.baseURL, idsParam)
@@ -77,7 +77,7 @@ func (r *RestPostRepository) MGetPosts(ctx context.Context, postIDs []string) ([
 		return nil, err
 	}
 
-	posts := make([]domain.Post, len(response.Posts))
+	posts := make([]posts.Post, len(response.Posts))
 	for i, apiPost := range response.Posts {
 		posts[i] = *apiPost.toDomain()
 	}
@@ -98,15 +98,15 @@ type PostContent struct {
 	Text *string `json:"text,omitempty"`
 }
 
-func (p postResponse) toDomain() *domain.Post {
-	contents := make([]domain.Content, len(p.Contents))
+func (p postResponse) toDomain() *posts.Post {
+	contents := make([]posts.Content, len(p.Contents))
 	for i, content := range p.Contents {
-		contents[i] = domain.Content{
+		contents[i] = posts.Content{
 			Type: content.Type,
 			Text: content.Text,
 		}
 	}
-	return &domain.Post{
+	return &posts.Post{
 		ID:          p.ID,
 		Contents:    contents,
 		AuthorID:    p.AuthorID,

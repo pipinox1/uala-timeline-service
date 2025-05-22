@@ -1,45 +1,31 @@
-package domain
+package service
 
 import (
 	"context"
 	"errors"
 	"time"
+	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/posts"
+	"uala-timeline-service/internal/domain/timeline"
 )
 
-type DayUserTimelineFilled struct {
-	LastUpdate time.Time
-	Posts      []Post
-	UserID     string
-}
-
-func (t DayUserTimelineFilled) AddPost(post Post) {
-	t.Posts = append(t.Posts, post)
-}
-
 type DayUserTimelineFilledService interface {
-	GetDayUserTimelineFilled(ctx context.Context, filter DayUserTimelineFilledFilter) (*DayUserTimelineFilled, error)
+	GetDayUserTimelineFilled(ctx context.Context, filter day_timeline_filled.DayUserTimelineFilledFilter) (*day_timeline_filled.DayUserTimelineFilled, error)
 	AddPost(ctx context.Context, postID string, userID string) error
 	RemovePost(ctx context.Context, postID string, userID string) error
 }
 
-type DayUserTimelineFilledRepository interface {
-	GetDayUserTimelineFilled(ctx context.Context, filter DayUserTimelineFilledFilter) (*DayUserTimelineFilled, error)
-	AddPosts(ctx context.Context, userID string, post []Post) error
-	UpdatePosts(ctx context.Context, userID string, post *Post) error
-	RemovePost(ctx context.Context, userID string, post *Post) error
-}
-
 type service struct {
-	timelineRepository TimelineRepository
-	postRepository     PostRepository
+	timelineRepository timeline.TimelineRepository
+	postRepository     posts.PostRepository
 	// TODO we use a cache separatly because we will take complex actions in the future to use o refresh the cache
-	timelineFilledRepository DayUserTimelineFilledRepository
+	timelineFilledRepository day_timeline_filled.DayUserTimelineFilledRepository
 }
 
 func NewTimelineService(
-	timelineRepository TimelineRepository,
-	postRepository PostRepository,
-	timelineFilledRepository DayUserTimelineFilledRepository,
+	timelineRepository timeline.TimelineRepository,
+	postRepository posts.PostRepository,
+	timelineFilledRepository day_timeline_filled.DayUserTimelineFilledRepository,
 ) DayUserTimelineFilledService {
 	return &service{
 		timelineRepository:       timelineRepository,
@@ -48,24 +34,13 @@ func NewTimelineService(
 	}
 }
 
-type DayUserTimelineFilledFilter struct {
-	UserID    string
-	FromDay   int
-	FromMonth int
-	FromYear  int
-	ToMonth   int
-	ToYear    int
-	ToDay     int
-	Page      int
-}
-
 func (s service) RemovePost(ctx context.Context, postID string, userID string) error {
 	post, err := s.postRepository.GetPostById(ctx, postID)
 	if err != nil {
 		return err
 	}
 
-	timelinePost := CreateTimelinePostFromPost(*post)
+	timelinePost := timeline.CreateTimelinePostFromPost(*post)
 	err = s.timelineRepository.RemovePostFromTimeline(ctx, userID, timelinePost)
 	if err != nil {
 		return err
@@ -81,13 +56,13 @@ func (s service) RemovePost(ctx context.Context, postID string, userID string) e
 	return nil
 }
 
-func (s service) GetDayUserTimelineFilled(ctx context.Context, filter DayUserTimelineFilledFilter) (*DayUserTimelineFilled, error) {
+func (s service) GetDayUserTimelineFilled(ctx context.Context, filter day_timeline_filled.DayUserTimelineFilledFilter) (*day_timeline_filled.DayUserTimelineFilled, error) {
 	timelineFilled, err := s.timelineFilledRepository.GetDayUserTimelineFilled(ctx, filter)
 	if err == nil {
 		return timelineFilled, nil
 	}
 
-	timeline, err := s.timelineRepository.GetUserTimeline(ctx, filter.UserID, TimelineFilter{
+	timeline, err := s.timelineRepository.GetUserTimeline(ctx, filter.UserID, timeline.TimelineFilter{
 		DateFrom: time.Date(filter.FromYear, time.Month(filter.FromMonth), filter.FromDay, 0, 0, 0, 0, time.UTC),
 		DateTo:   time.Date(filter.ToYear, time.Month(filter.ToMonth), filter.ToDay, 23, 59, 59, 59, time.UTC),
 	})
@@ -110,7 +85,8 @@ func (s service) GetDayUserTimelineFilled(ctx context.Context, filter DayUserTim
 		return nil, err
 	}
 
-	return nil, nil
+	newTimelineFilled := day_timeline_filled.CreateDayUserTimelineFilled(filter.UserID, posts)
+	return &newTimelineFilled, nil
 }
 
 func (s service) AddPost(ctx context.Context, postID string, userID string) error {
@@ -121,8 +97,8 @@ func (s service) AddPost(ctx context.Context, postID string, userID string) erro
 
 	_, err = s.timelineRepository.GetUserPostTimeline(ctx, userID, postID)
 	if err != nil {
-		if errors.Is(err, ErrUserTimelineNotFound) {
-			timelinePost := CreateTimelinePostFromPost(*post)
+		if errors.Is(err, timeline.ErrUserTimelineNotFound) {
+			timelinePost := timeline.CreateTimelinePostFromPost(*post)
 			err = s.timelineRepository.AddPostToUserTimeline(ctx, userID, timelinePost)
 			if err != nil {
 				return err
@@ -130,7 +106,7 @@ func (s service) AddPost(ctx context.Context, postID string, userID string) erro
 		}
 	}
 
-	dayTimeline, err := s.timelineFilledRepository.GetDayUserTimelineFilled(ctx, DayUserTimelineFilledFilter{
+	dayTimeline, err := s.timelineFilledRepository.GetDayUserTimelineFilled(ctx, day_timeline_filled.DayUserTimelineFilledFilter{
 		UserID:    userID,
 		FromDay:   post.PublishedAt.Day(),
 		FromMonth: int(post.PublishedAt.Month()),
@@ -154,7 +130,7 @@ func (s service) AddPost(ctx context.Context, postID string, userID string) erro
 		}
 	}
 
-	err = s.timelineFilledRepository.AddPosts(ctx, userID, []Post{*post})
+	err = s.timelineFilledRepository.AddPosts(ctx, userID, []posts.Post{*post})
 	if err != nil {
 		return err
 	}

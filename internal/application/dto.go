@@ -2,7 +2,7 @@ package application
 
 import (
 	"time"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/day_timeline_filled"
 )
 
 type TimelineFilled struct {
@@ -23,7 +23,7 @@ type Content struct {
 	Url  *string `json:"url,omitempty"`
 }
 
-func FromDomain(timelineFilled *domain.DayUserTimelineFilled) *TimelineFilled {
+func FromDomain(timelineFilled *day_timeline_filled.DayUserTimelineFilled) *TimelineFilled {
 	posts := make([]Post, len(timelineFilled.Posts))
 	for i, post := range timelineFilled.Posts {
 		contents := make([]Content, len(post.Contents))

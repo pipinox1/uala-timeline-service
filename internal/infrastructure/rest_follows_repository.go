@@ -5,10 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
-	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/follows"
 )
 
-var _ domain.FollowRepository = (*RestFollowsRepository)(nil)
+var _ follows.FollowRepository = (*RestFollowsRepository)(nil)
 
 type RestFollowsRepository struct {
 	client  *resty.Client

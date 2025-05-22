@@ -4,6 +4,8 @@ import (
 	"context"
 	"sync"
 	"uala-timeline-service/internal/domain"
+	"uala-timeline-service/internal/domain/follows"
+	"uala-timeline-service/internal/domain/posts"
 	"uala-timeline-service/libs/events"
 )
 
@@ -13,14 +15,14 @@ type SplitPostUpdateForUsersCommand struct {
 }
 
 type SplitPostUpdateForUsers struct {
-	postRepository    domain.PostRepository
-	followsRepository domain.FollowRepository
+	postRepository    posts.PostRepository
+	followsRepository follows.FollowRepository
 	eventPublisher    events.Publisher
 }
 
 func NewSplitPostUpdateForUsers(
-	postRepository domain.PostRepository,
-	followsRepository domain.FollowRepository,
+	postRepository posts.PostRepository,
+	followsRepository follows.FollowRepository,
 	eventPublisher events.Publisher,
 ) *SplitPostUpdateForUsers {
 	return &SplitPostUpdateForUsers{

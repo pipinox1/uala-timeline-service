@@ -19,7 +19,7 @@ To reduce and scale more we will reduce the size of post stored using gzip compr
 
 #### Get user timeline
 
-```http
+```
   POST /api/v1/user_timeline/${user_id}
 ```
 

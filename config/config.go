@@ -11,7 +11,7 @@ import (
 type Config struct {
 	ServiceName string      `mapstructure:"service_name"`
 	Env         string      `mapstructure:"env"`
-	Port        int         `mapstructure:"port"`
+	Port        string      `mapstructure:"port"`
 	Postgres    Postgres    `mapstructure:"postgres"`
 	AWS         AWS         `mapstructure:"aws"`
 	RestConfigs RestConfigs `mapstructure:"rest_configs"`
@@ -41,7 +41,7 @@ type AWS struct {
 
 type Postgres struct {
 	Host     string `mapstructure:"host"`
-	Port     int    `mapstructure:"port"`
+	Port     string `mapstructure:"port"`
 	Password string `mapstructure:"password"`
 	Database string `mapstructure:"database"`
 	User     string `mapstructure:"user"`

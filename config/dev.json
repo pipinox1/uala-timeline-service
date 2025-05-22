@@ -1,7 +1,7 @@
 {
   "env": "dev",
   "service_name": "timeline-service",
-  "rest_apis": {
+  "rest_configs": {
     "post_service": {
       "base_path": "http://post-servic:8080",
       "timeout": 2000

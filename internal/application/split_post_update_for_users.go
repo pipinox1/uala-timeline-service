@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"github.com/rs/zerolog/log"
 	"sync"
 	"uala-timeline-service/internal/domain"
 	"uala-timeline-service/internal/domain/follows"
@@ -46,6 +47,7 @@ func (s *SplitPostUpdateForUsers) Exec(ctx context.Context, cmd *SplitPostUpdate
 			defer wg.Done()
 			err := s.eventPublisher.Publish(context.WithoutCancel(ctx), domain.NewUserTimelineAddPostEvent(followerID, cmd.ID))
 			if err != nil {
+				log.Err(err).Msg("error publishing user-post to add post to timeline")
 				// TODO: log error and send to a retries queue to avoid retrying all the users for some fails
 				return
 			}

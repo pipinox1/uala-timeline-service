@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/nats-io/nats.go"
-	"log"
+	"github.com/rs/zerolog/log"
 	"uala-timeline-service/config"
 	"uala-timeline-service/internal/application"
 )
@@ -17,10 +17,11 @@ func handlePostCreated(dependencies *config.Dependencies) func(msg *nats.Msg) {
 		dependencies.EventPublisher,
 	)
 	return func(msg *nats.Msg) {
+		log.Info().Msg("handlePostCreated event")
 		var cmd application.SplitPostUpdateForUsersCommand
 		err := json.Unmarshal(msg.Data, &cmd)
 		if err != nil {
-			log.Printf("Error unmarshalling data: %v\n", err)
+			log.Err(err)
 			return
 		}
 		err = splitPostUpdateForUsers.Exec(context.Background(), &cmd)
@@ -34,10 +35,11 @@ func handlePostCreated(dependencies *config.Dependencies) func(msg *nats.Msg) {
 func addPostToTimeline(dependencies *config.Dependencies) func(msg *nats.Msg) {
 	addPostToTimeline := application.NewAddPostToUserTimeline(dependencies.TimelineService)
 	return func(msg *nats.Msg) {
+		log.Info().Msg("addPostToTimeline event")
 		var cmd application.AddPostToUserTimelineCommand
 		err := json.Unmarshal(msg.Data, &cmd)
 		if err != nil {
-			log.Printf("Error unmarshalling data: %v\n", err)
+			log.Err(err)
 			return
 		}
 		err = addPostToTimeline.Exec(context.Background(), &cmd)

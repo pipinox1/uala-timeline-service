@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"github.com/rs/zerolog/log"
 	"uala-timeline-service/internal/domain/follows"
 )
 
@@ -22,10 +23,12 @@ func (r *RestFollowsRepository) GetUserFollowerIDs(ctx context.Context, userID s
 		Get(endpoint)
 
 	if err != nil {
+		log.Err(err).Msg("error getting user followers")
 		return nil, fmt.Errorf("error fetching post: %w", err)
 	}
 
 	if resp.IsError() {
+		log.Err(err).Msg("error getting user followers")
 		return nil, fmt.Errorf("API returned error status: %d - %s", resp.StatusCode(), resp.String())
 	}
 

@@ -11,6 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/rs/zerolog/log"
 	"io"
 	"time"
 	"uala-timeline-service/internal/domain/day_timeline_filled"
@@ -51,6 +52,7 @@ func (d *DynamoDayTimelineFilledRepository) GetDayUserTimelineFilled(ctx context
 
 	result, err := d.client.GetItem(ctx, input)
 	if err != nil {
+		log.Err(err).Msg("error getting timelinefilled from dynamo")
 		return nil, err
 	}
 
@@ -99,7 +101,6 @@ func (d *DynamoDayTimelineFilledRepository) AddPosts(ctx context.Context, userID
 
 		item, err := attributevalue.MarshalMap(dayTimeline)
 		if err != nil {
-			fmt.Println(err)
 			return err
 		}
 		transactItem := types.TransactWriteItem{
@@ -118,6 +119,7 @@ func (d *DynamoDayTimelineFilledRepository) AddPosts(ctx context.Context, userID
 
 	_, err := d.client.TransactWriteItems(ctx, input)
 	if err != nil {
+		log.Err(err).Msg("error TransactWriteItems timelinefilled from dynamo")
 		return err
 	}
 	return nil
@@ -158,7 +160,11 @@ func (d *DynamoDayTimelineFilledRepository) UpdatePosts(ctx context.Context, use
 	}
 
 	_, err = d.client.PutItem(ctx, putInput)
-	return err
+	if err != nil {
+		log.Err(err).Msg("error UpdatePosts timelinefilled from dynamo")
+		return err
+	}
+	return nil
 }
 
 func (d *DynamoDayTimelineFilledRepository) getDayFilled(ctx context.Context, userID string, dayKey string) (*DynamoDayUserTimelinePage, error) {

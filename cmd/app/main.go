@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
 	httpServer "net/http"
 	"os"
 	"os/signal"
@@ -16,6 +18,19 @@ func main() {
 	if err != nil {
 		panic(fmt.Errorf("fatal error loading config file: %w", err))
 	}
+
+	level, err := zerolog.ParseLevel(zerolog.InfoLevel.String())
+	if err != nil {
+		panic(fmt.Errorf("invalid LogLevel value retrieved from environment: %w", err))
+	}
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
+	_ = zerolog.New(os.Stdout).
+		Level(level).
+		With().
+		Timestamp().
+		Str("service", cfg.ServiceName).
+		Logger()
 
 	dependencies, err := config.BuildDependencies(*cfg)
 	if err != nil {

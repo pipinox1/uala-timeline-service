@@ -1,21 +1,21 @@
 {
   "env": "dev",
   "service_name": "timeline-service",
-  "rest_configs": {
+  "rest_apis": {
     "post_service": {
-      "base_path": "http://localhost:8080",
+      "base_path": "http://post-servic:8080",
       "timeout": 2000
     },
     "followers_service": {
-      "base_path": "http://localhost:8082",
+      "base_path": "http://followers-service:8082",
       "timeout": 2000
     }
   },
   "postgres": {
     "port": 5432,
     "user": "eduardopena",
-    "password": "",
-    "host": "localhost",
+    "password": "password",
+    "host": "postgres",
     "database": "timelines",
     "ssl": false
   },
@@ -26,7 +26,7 @@
     "secret": "qcdbm4"
   },
   "nats": {
-    "host": "localhost"
+    "host": "nats"
   },
   "port": 8081
 }

@@ -3,7 +3,7 @@ package application
 import (
 	"context"
 	"fmt"
-	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/day_timeline_filled/service"
 )
 
 type AddPostToUserTimelineCommand struct {
@@ -12,11 +12,11 @@ type AddPostToUserTimelineCommand struct {
 }
 
 type AddPostToUserTimeline struct {
-	timelineService day_timeline_filled.DayUserTimelineFilledService
+	timelineService service.DayUserTimelineFilledService
 }
 
 func NewAddPostToUserTimeline(
-	timelineService day_timeline_filled.DayUserTimelineFilledService,
+	timelineService service.DayUserTimelineFilledService,
 ) *AddPostToUserTimeline {
 	return &AddPostToUserTimeline{
 		timelineService: timelineService,

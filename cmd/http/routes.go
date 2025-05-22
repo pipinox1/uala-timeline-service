@@ -21,7 +21,6 @@ func SetupRouterAndRoutes(config *config.Config, deps *config.Dependencies) chi.
 		r.Use(middleware.SetHeader("Content-Type", "application/json"))
 		r.Use(ddchi.Middleware(ddchi.WithServiceName(config.ServiceName)))
 		r.Post("/{user_id}", getUserTimelineByDay(deps))
-		r.Post("/add", addPostToUserTimeline(deps))
 	})
 
 	return router

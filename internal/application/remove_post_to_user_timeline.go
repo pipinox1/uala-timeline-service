@@ -2,7 +2,7 @@ package application
 
 import (
 	"context"
-	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/day_timeline_filled/service"
 )
 
 type RemovePostToUserTimelineTimeCommand struct {
@@ -11,10 +11,10 @@ type RemovePostToUserTimelineTimeCommand struct {
 }
 
 type RemovePostToUserTimelineTime struct {
-	timelineService day_timeline_filled.DayUserTimelineFilledService
+	timelineService service.DayUserTimelineFilledService
 }
 
-func NewRemovePostToUserTimelineTime(timelineService day_timeline_filled.DayUserTimelineFilledService) *RemovePostToUserTimelineTime {
+func NewRemovePostToUserTimelineTime(timelineService service.DayUserTimelineFilledService) *RemovePostToUserTimelineTime {
 	return &RemovePostToUserTimelineTime{
 		timelineService: timelineService,
 	}

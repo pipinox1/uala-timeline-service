@@ -1,9 +1,16 @@
-Pendings:
-- Dockerfiles
-- Docker compose para poder levantar en local tanto Postgres, Nats.io. Redis y los 3 microservicios
-- Uso de paginado a la hora de traer y cachear el timeline con una mejora en el mecanimsmo de flusheo
-- Yamls file para deploy en k8s
-- Rest repositories porque estan mockeados
-- DDL para postgres
-- Tests unitarios
-- Tests de integracion
+En el serivio uala-posts-service se encuentra el docker-compose para levantar todos los servicios:
+
+Primero hay que correr dentro de cada repositorio despues de ser clonados el comando:
+
+- make build
+
+Estoy generara una imagen de cada microservicio
+
+Luego nos paramos en la terminal sobre el repositorio de uala-posts-service y ejecutamos:
+
+- docker-compose -up -d
+
+Puertos de cada servicio:
+- posts-service : 8080
+- timeline-service: 8081
+- followers-service: 8082

@@ -13,23 +13,6 @@ var (
 	ErrInvalidUser = errors.New("invalid user")
 )
 
-func addPostToUserTimeline(deps *config.Dependencies) http.HandlerFunc {
-	createPost := application.NewAddPostToUserTimeline(deps.TimelineService)
-	return func(w http.ResponseWriter, r *http.Request) {
-		var cmd application.AddPostToUserTimelineCommand
-		err := json.NewDecoder(r.Body).Decode(&cmd)
-		if err != nil {
-			handleError(w, err)
-			return
-		}
-		err = createPost.Exec(r.Context(), &cmd)
-		if err != nil {
-			handleError(w, err)
-			return
-		}
-	}
-}
-
 func getUserTimelineByDay(deps *config.Dependencies) http.HandlerFunc {
 	createPost := application.NewGetUserTimeline(deps.TimelineService)
 	return func(w http.ResponseWriter, r *http.Request) {

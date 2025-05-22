@@ -1,15 +1,13 @@
 package config
 
 import (
-	"context"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/go-redis/redis/v8"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/day_timeline_filled/service"
 	"uala-timeline-service/internal/domain/follows"
 	"uala-timeline-service/internal/domain/posts"
 	"uala-timeline-service/internal/infrastructure"
@@ -20,12 +18,12 @@ type Dependencies struct {
 	EventPublisher   events.Publisher
 	FollowRepository follows.FollowRepository
 	PostRepository   posts.PostRepository
-	TimelineService  day_timeline_filled.DayUserTimelineFilledService
+	TimelineService  service.DayUserTimelineFilledService
 }
 
 func BuildDependencies(config Config) (*Dependencies, error) {
 	// Nats boot
-	natsPublisher := events.NewNatsPublisher()
+	natsPublisher := events.NewNatsPublisher(config.Nats.Host)
 
 	// Postgres boot
 	url := fmt.Sprintf(
@@ -48,15 +46,6 @@ func BuildDependencies(config Config) (*Dependencies, error) {
 		panic(err)
 	}
 
-	// Redis boot
-	redisClient := redis.NewClient(&redis.Options{
-		Addr: config.Redis.Host,
-	})
-	res := redisClient.Ping(context.Background())
-	if res.Err() != nil {
-		panic(res.Err())
-	}
-
 	// AWS boot
 	var a = "http://localhost:8000"
 
@@ -74,10 +63,10 @@ func BuildDependencies(config Config) (*Dependencies, error) {
 
 	timelineRepository := infrastructure.NewTimelineRepository(db)
 	dayTimelineFilledRepository := infrastructure.NewDynamoPaymentRepository(dynamoDb, config.AWS.Table)
-	postRepository := infrastructure.NewRestPostRepository("http://localhost:8080")
-	followsRepository := infrastructure.NewRestFollowsRepository("http://localhost:8082")
+	postRepository := infrastructure.NewRestPostRepository(config.RestConfigs.PostService.BasePath)
+	followsRepository := infrastructure.NewRestFollowsRepository(config.RestConfigs.FollowersService.BasePath)
 
-	timelineService := day_timeline_filled.NewTimelineService(timelineRepository, postRepository, dayTimelineFilledRepository)
+	timelineService := service.NewTimelineService(timelineRepository, postRepository, dayTimelineFilledRepository)
 
 	return &Dependencies{
 		TimelineService:  timelineService,

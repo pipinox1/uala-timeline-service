@@ -3,46 +3,49 @@ package config
 import (
 	"fmt"
 	"github.com/spf13/viper"
+	"os"
 	"path/filepath"
 	"runtime"
 )
 
 type Config struct {
-	ServiceName string   `json:" "`
-	Env         string   `json:"env"`
-	Port        string   `json:"port"`
-	Postgres    Postgres `json:"postgres"`
-	Redis       Redis    `json:"redis"`
-	AWS         AWS      `json:"aws"`
+	ServiceName string      `mapstructure:"service_name"`
+	Env         string      `mapstructure:"env"`
+	Port        int         `mapstructure:"port"`
+	Postgres    Postgres    `mapstructure:"postgres"`
+	AWS         AWS         `mapstructure:"aws"`
+	RestConfigs RestConfigs `mapstructure:"rest_configs"`
+	Nats        Nats        `mapstructure:"nats"`
+}
+
+type Nats struct {
+	Host string `mapstructure:"host"`
 }
 
 type RestConfigs struct {
-	PostService RestConfig `json:"post_service"`
-}
-
-type Redis struct {
-	Host string `json:"redis_host"`
+	PostService      RestConfig `mapstructure:"post_service"`
+	FollowersService RestConfig `mapstructure:"followers_service"`
 }
 
 type RestConfig struct {
-	BasePath string `json:"base_path"`
-	Timeout  int    `json:"timeout"`
+	BasePath string `mapstructure:"base_path"`
+	Timeout  int    `mapstructure:"timeout"`
 }
 
 type AWS struct {
-	Region  string `json:"region"`
-	Table   string `json:"table"`
-	Secret  string `json:"secret"`
-	Account string `json:"account"`
+	Region  string `mapstructure:"region"`
+	Table   string `mapstructure:"table"`
+	Secret  string `mapstructure:"secret"`
+	Account string `mapstructure:"account"`
 }
 
 type Postgres struct {
-	Host     string `json:"postgres_host"`
-	Port     string `json:"port"`
-	Password string `json:"password"`
-	Database string `json:"database"`
-	User     string `json:"user"`
-	UseSSL   bool   `json:"use_ssl"`
+	Host     string `mapstructure:"host"`
+	Port     int    `mapstructure:"port"`
+	Password string `mapstructure:"password"`
+	Database string `mapstructure:"database"`
+	User     string `mapstructure:"user"`
+	UseSSL   bool   `mapstructure:"use_ssl"`
 }
 
 func ReadConfig() (*Config, error) {
@@ -52,7 +55,7 @@ func ReadConfig() (*Config, error) {
 	}
 
 	configDir := filepath.Join(filepath.Dir(filename))
-	viper.SetConfigName("local")
+	viper.SetConfigName(getConfigName())
 	viper.SetConfigType("json")
 	viper.AddConfigPath(configDir)
 
@@ -68,4 +71,12 @@ func ReadConfig() (*Config, error) {
 	}
 
 	return &config, nil
+}
+
+func getConfigName() string {
+	env := os.Getenv("ENVIRONMENT")
+	if env == "" {
+		return "local"
+	}
+	return env
 }

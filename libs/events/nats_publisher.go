@@ -11,8 +11,8 @@ type NatsPublisher struct {
 	conn *nats.Conn
 }
 
-func NewNatsPublisher() *NatsPublisher {
-	nc, err := nats.Connect("nats://localhost:4222")
+func NewNatsPublisher(host string) *NatsPublisher {
+	nc, err := nats.Connect(fmt.Sprintf("nats://%s:4222", host))
 	if err != nil {
 		log.Fatal("Error conectando a NATS:", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"uala-timeline-service/internal/domain/day_timeline_filled"
+	"uala-timeline-service/internal/domain/day_timeline_filled/service"
 )
 
 var (
@@ -25,10 +26,10 @@ type GetUserTimelineResponse struct {
 }
 
 type GetUserTimeline struct {
-	timelineService day_timeline_filled.DayUserTimelineFilledService
+	timelineService service.DayUserTimelineFilledService
 }
 
-func NewGetUserTimeline(timelineService day_timeline_filled.DayUserTimelineFilledService) *GetUserTimeline {
+func NewGetUserTimeline(timelineService service.DayUserTimelineFilledService) *GetUserTimeline {
 	return &GetUserTimeline{
 		timelineService: timelineService,
 	}

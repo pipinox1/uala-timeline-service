@@ -7,7 +7,7 @@
       "timeout": 2000
     },
     "followers_service": {
-      "base_path": "http://followers-service:8082",
+      "base_path": "http://followers-service:8080",
       "timeout": 2000
     }
   },
@@ -28,5 +28,5 @@
   "nats": {
     "host": "nats"
   },
-  "port": 8081
+  "port": 8080
 }

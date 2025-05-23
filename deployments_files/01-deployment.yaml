@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: timeline-service
+  name: timeline-service
+  namespace: core
+spec:
+  replicas: 2
+  progressDeadlineSeconds: 600
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: timeline-service
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: timeline-service
+    spec:
+      containers:
+        - image: uala-timeline-service:latest
+          imagePullPolicy: IfNotPresent
+          name: timeline-service
+          resources:
+            limits:
+              cpu: 750m
+              memory: "1000Mi"
+            requests:
+              cpu: 150m
+              memory: "512Mi"
+          ports:
+            - containerPort: 8080
+              name: web
+              protocol: TCP
+          env:
+            - name: ENVIRONMENT
+              value: "dev"
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: web
+            failureThreshold: 1
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ping
+              port: web
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30

@@ -47,8 +47,6 @@ func BuildDependencies(config Config) (*Dependencies, error) {
 	}
 
 	// AWS boot
-	var a = "http://localhost:8000"
-
 	awsCfg := aws.Config{
 		Region: config.AWS.Region,
 		Credentials: credentials.NewStaticCredentialsProvider(
@@ -56,7 +54,9 @@ func BuildDependencies(config Config) (*Dependencies, error) {
 			config.AWS.Secret,
 			"",
 		),
-		BaseEndpoint: &a,
+	}
+	if config.AWS.Host != "" {
+		awsCfg.BaseEndpoint = &config.AWS.Host
 	}
 
 	dynamoDb := dynamodb.NewFromConfig(awsCfg)

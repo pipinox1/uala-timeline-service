@@ -37,6 +37,7 @@ type AWS struct {
 	Table   string `mapstructure:"table"`
 	Secret  string `mapstructure:"secret"`
 	Account string `mapstructure:"account"`
+	Host    string `mapstructure:"host"`
 }
 
 type Postgres struct {

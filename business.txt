@@ -1,3 +1,4 @@
 En el archivo architecture.md hay una breve explicacion de la arquitectura
 
-Para estar version solo se permite pedir de a 1 día ya que me faltó implementar el multiget en el dynamo por varios dias
+- Para estar version solo se permite pedir de a 1 día ya que me faltó implementar el multiget en el dynamo por varios dias
+- Se agregan en la carpeta deployment_fiiles de uala-timeline-service los archivos para deployar este servicio en kubernetes pero solo a modo de mostrarlos

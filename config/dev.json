@@ -3,7 +3,7 @@
   "service_name": "timeline-service",
   "rest_configs": {
     "post_service": {
-      "base_path": "http://post-servic:8080",
+      "base_path": "http://post-service:8080",
       "timeout": 2000
     },
     "followers_service": {
@@ -23,7 +23,8 @@
     "region": "localhost",
     "table": "users-timelines",
     "account": "lhg4g",
-    "secret": "qcdbm4"
+    "secret": "qcdbm4",
+    "host": "http://dynamodb-local:8000"
   },
   "nats": {
     "host": "nats"

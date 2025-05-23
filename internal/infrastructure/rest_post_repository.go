@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/go-resty/resty/v2"
+	"github.com/rs/zerolog/log"
 	"strings"
 	"time"
 	"uala-timeline-service/internal/domain/posts"
@@ -32,10 +33,12 @@ func (r *RestPostRepository) GetPostById(ctx context.Context, id string) (*posts
 		Get(endpoint)
 
 	if err != nil {
+		log.Err(err).Msg("error getting post")
 		return nil, fmt.Errorf("error fetching post: %w", err)
 	}
 
 	if resp.IsError() {
+		log.Err(err).Msg("error getting post")
 		return nil, fmt.Errorf("API returned error status: %d - %s", resp.StatusCode(), resp.String())
 	}
 
@@ -64,10 +67,12 @@ func (r *RestPostRepository) MGetPosts(ctx context.Context, postIDs []string) ([
 		Get(endpoint)
 
 	if err != nil {
+		log.Err(err).Msg("error getting mpost")
 		return nil, fmt.Errorf("error fetching posts: %w", err)
 	}
 
 	if resp.IsError() {
+		log.Err(err).Msg("error getting mpost")
 		return nil, fmt.Errorf("API returned error status: %d - %s", resp.StatusCode(), resp.String())
 	}
 

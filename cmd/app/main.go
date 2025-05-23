@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
+	_ "go.uber.org/automaxprocs/maxprocs"
 	httpServer "net/http"
 	"os"
 	"os/signal"

@@ -23,7 +23,8 @@
     "region": "localhost",
     "table": "users-timelines",
     "account": "lhg4g",
-    "secret": "qcdbm4"
+    "secret": "qcdbm4",
+    "host": "localhost"
   },
   "nats": {
     "host": "localhost"

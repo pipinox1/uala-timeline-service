@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/huandu/go-sqlbuilder"
 	"github.com/jmoiron/sqlx"
+	"github.com/rs/zerolog/log"
 	"time"
 	"uala-timeline-service/internal/domain/timeline"
 )
@@ -38,6 +39,7 @@ func (t *TimelineRepository) GetUserPostTimeline(ctx context.Context, userID str
 	var postDB postTimelineRow
 	err := t.db.GetContext(ctx, &postDB, getPostTimelineRow, postId, userID)
 	if err != nil {
+		log.Err(err).Msg("error getting user timeline from postgres")
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, timeline.ErrUserTimelineNotFound
 		}
@@ -62,6 +64,7 @@ func (t *TimelineRepository) GetUserTimeline(ctx context.Context, userID string,
 	var pgPostTimelineRows []postTimelineRow
 	err := t.db.SelectContext(ctx, &pgPostTimelineRows, query, args...)
 	if err != nil {
+		log.Err(err).Msg("error getting user timeline from postgres")
 		return nil, fmt.Errorf("error getting user timeline: %w", err)
 	}
 
@@ -96,6 +99,7 @@ func (t *TimelineRepository) AddPostToUserTimeline(ctx context.Context, userID s
 		})
 
 	if err != nil {
+		log.Err(err).Msg("error adding post to user timeline postgres")
 		return err
 	}
 
